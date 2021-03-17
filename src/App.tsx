@@ -6,23 +6,16 @@ function App() {
 
     const [selectValue, setSelectValue] = useState(0);
 
-    const createSelect = (): Array<object> => {
-        let options = []
-        for (let i = 0; i < 12; i++) {
-            options.push(<option key={i} value={i}>ПК{i + 1}</option>)
-        }
-        return options
-    }
-
-    const handleChange = (event: React.SyntheticEvent): void => {
-        let target = event.target as HTMLSelectElement;
-        setSelectValue(Number(target.value))
+    const handleChange = (event: React.ChangeEvent<HTMLSelectElement>): void => {
+        setSelectValue(Number(event.target.value))
     }
 
     return (
         <div className="App">
             <select defaultValue={selectValue} onChange={handleChange}>
-                {createSelect()}
+                {
+                    Array.from({length: 12}, (v, i) => <option key={i} value={i}>ПК{i + 1}</option>)
+                }
             </select>
             <TableComponent currentPk={selectValue}/>
         </div>

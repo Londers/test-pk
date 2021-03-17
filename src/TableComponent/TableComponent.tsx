@@ -3,19 +3,20 @@ import "./TableComponent.sass"
 import rawData from "../data.json"
 import TableCellComponent from "../TableCellComponent/TableCellComponent";
 
-export default function TableComponent(props: { currentPk: number}) {
+function TableComponent(props: { currentPk: number }) {
+
+    const phaseTypes = [' ', 'МГР', '1 ТВП', '2ТВП', '1,2 ТВП', 'Зам. 1ТВП', 'Зам. 2ТВП', 'Зам.', 'МДК', 'ВДК']
 
     const [data, setData] = useState(rawData)
 
-    const setDataFromChild = (newData: typeof rawData) => {
-        setData(newData);
-        onClickHandler();
-        console.log('cool');
+    const handleTFChange = (event: React.ChangeEvent<HTMLSelectElement>, rowIndex: number) => {
+        data.data.state.arrays.SetDK.dk[props.currentPk].sts[rowIndex].tf = Number(event.currentTarget.value)
+        setData(Object.assign({}, data))
     }
 
-    const [, setCount] = useState(0)
-    const onClickHandler = () => {
-        setCount(prevCount => prevCount + 1)
+    const handlePlusChange = (event: React.ChangeEvent<HTMLSelectElement>, rowIndex: number) => {
+        data.data.state.arrays.SetDK.dk[props.currentPk].sts[rowIndex].plus = event.currentTarget.value === '+'
+        setData(Object.assign({}, data))
     }
 
     return (
@@ -34,19 +35,54 @@ export default function TableComponent(props: { currentPk: number}) {
                 </thead>
                 <tbody>
                 {
-                    data.data.state.arrays.SetDK.dk[props.currentPk].sts.map((sw, index) => {
+                    data.data.state.arrays.SetDK.dk[props.currentPk].sts.map((sw, rowIndex) => {
                         return (
-                            <tr key={index}>
+                            <tr key={rowIndex}>
                                 <td>{sw.line}</td>
-                                <TableCellComponent data={data}
-                                                    setData={setDataFromChild}
-                                                    value={data.data.state.arrays.SetDK.dk[props.currentPk].sts[index].start}
-                                                    index={index}
-                                                    currentPk={props.currentPk}/>
-                                <td>{sw.tf}</td>
-                                <td>{sw.num}</td>
-                                <td>{sw.stop - sw.start}</td>
-                                <td>{sw.plus ? '+' : ''}</td>
+                                <TableCellComponent
+                                    type={'start'}
+                                    data={data}
+                                    setData={setData}
+                                    value={sw.start}
+                                    rowIndex={rowIndex}
+                                    currentPk={props.currentPk}/>
+                                <td>
+                                    <select key={rowIndex} value={sw.tf}
+                                            onChange={(event) => handleTFChange(event, rowIndex)}>
+                                        {
+                                            phaseTypes.map((phase, index) =>
+                                                <option key={index} value={index}>{phase}</option>)
+                                        }
+                                    </select>
+                                </td>
+                                <TableCellComponent
+                                    type={'num'}
+                                    data={data}
+                                    setData={setData}
+                                    value={sw.num}
+                                    rowIndex={rowIndex}
+                                    currentPk={props.currentPk}/>
+                                <TableCellComponent
+                                    type={'stop'}
+                                    data={data}
+                                    setData={setData}
+                                    value={sw.stop - sw.start}
+                                    rowIndex={rowIndex}
+                                    currentPk={props.currentPk}/>
+
+                                <td>
+                                    {
+                                        ((sw.tf >= 2) && (sw.tf <= 4)) ? (
+                                            <select value={sw.plus ? '+' : ''}
+                                                    onChange={(event) => handlePlusChange(event, rowIndex)}>
+                                                <option key={0}>{}</option>
+                                                <option key={1}>+</option>
+                                            </select>
+                                        ) : (
+                                            ''
+                                        )
+                                    }
+                                </td>
                             </tr>
                         )
                     })
@@ -56,3 +92,5 @@ export default function TableComponent(props: { currentPk: number}) {
         </div>
     )
 }
+
+export default TableComponent
