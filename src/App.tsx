@@ -1,26 +1,32 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {useState} from 'react';
+import './App.sass';
+import TableComponent from "./TableComponent/TableComponent";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+    const [selectValue, setSelectValue] = useState(0);
+
+    const createSelect = (): Array<object> => {
+        let options = []
+        for (let i = 0; i < 12; i++) {
+            options.push(<option key={i} value={i}>ПК{i + 1}</option>)
+        }
+        return options
+    }
+
+    const handleChange = (event: React.SyntheticEvent): void => {
+        let target = event.target as HTMLSelectElement;
+        setSelectValue(Number(target.value))
+    }
+
+    return (
+        <div className="App">
+            <select defaultValue={selectValue} onChange={handleChange}>
+                {createSelect()}
+            </select>
+            <TableComponent currentPk={selectValue}/>
+        </div>
+    )
 }
 
-export default App;
+export default App
